@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/dynamodb"
+	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -33,6 +34,19 @@ func main() {
 		if err != nil {
 			return err
 		}
+
+		// Create the lambda using the args.
+		_, err := lambda.NewFunction(ctx, "basicLambda", &lambda.FunctionArgs{
+			Handler: pulumi.String("handler"),
+			Role:    role.Arn,
+			Runtime: pulumi.String("go1.x"),
+			Code:    pulumi.NewFileArchive("./lambda/handler.zip"),
+		},
+		)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
