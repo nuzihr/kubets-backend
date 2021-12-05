@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/lambda"
 	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/dynamodb"
-	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -36,13 +36,27 @@ func main() {
 		}
 
 		// Create the lambda using the args.
-		_, err := lambda.NewFunction(ctx, "basicLambda", &lambda.FunctionArgs{
-			Handler: pulumi.String("handler"),
-			Role:    role.Arn,
-			Runtime: pulumi.String("go1.x"),
-			Code:    pulumi.NewFileArchive("./lambda/handler.zip"),
-		},
-		)
+		funcName := "get-money-logs"
+		_, err = lambda.NewFunction(ctx, funcName, &lambda.FunctionArgs{
+			FunctionName: pulumi.String(funcName),
+			Handler:      pulumi.String("handler"),
+			Role:         pulumi.String("arn:aws:iam::886042148794:role/lambda_role"),
+			Code: &lambda.FunctionCodeArgs{
+				S3Bucket: pulumi.String("kubets"),
+				S3Key:    pulumi.String("lambda.zip"),
+			},
+			Runtime:    pulumi.String("go1.x"),
+			MemorySize: pulumi.Int(128),
+			Timeout:    pulumi.Int(5),
+			VpcConfig: &lambda.FunctionVpcConfigArgs{
+				SecurityGroupIds: pulumi.StringArray{
+					pulumi.String("sg-02e5145c0e0c7647d"),
+				},
+				SubnetIds: pulumi.StringArray{
+					pulumi.String("subnet-0ee72ac65b0743a26"),
+				},
+			},
+		})
 		if err != nil {
 			return err
 		}
