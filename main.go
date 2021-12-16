@@ -43,19 +43,11 @@ func main() {
 			Role:         pulumi.String("arn:aws:iam::886042148794:role/lambda_role"),
 			Code: &lambda.FunctionCodeArgs{
 				S3Bucket: pulumi.String("kubets"),
-				S3Key:    pulumi.String("lambda.zip"),
+				S3Key:    pulumi.String("handler.zip"),
 			},
 			Runtime:    pulumi.String("go1.x"),
 			MemorySize: pulumi.Int(128),
 			Timeout:    pulumi.Int(5),
-			VpcConfig: &lambda.FunctionVpcConfigArgs{
-				SecurityGroupIds: pulumi.StringArray{
-					pulumi.String("sg-02e5145c0e0c7647d"),
-				},
-				SubnetIds: pulumi.StringArray{
-					pulumi.String("subnet-0ee72ac65b0743a26"),
-				},
-			},
 		})
 		if err != nil {
 			return err
